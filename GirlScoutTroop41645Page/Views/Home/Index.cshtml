@@ -2,7 +2,67 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@*Welcome Banner*@
+<div class="container-fluid p-5 bg-success text-white text-center">
+    <h1>Welcome to GS Troop 41645 Page</h1>
+    <p>Troop Motto</p>
+</div>
+@*First Column*@
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-sm-4">
+            <h3>Join Us</h3>
+            <ul>
+                <li>Join the troop</li>
+                <li>Volunteer</li>
+            </ul>
+        </div>
+
+        @*Second Column*@
+        <div class="col-sm-4">
+            <h3>About Us</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+        </div>
+
+        @*Third column*@
+        <div class="col-sm-4">
+            <h3>Meet our Leaders</h3>
+            <ul>
+                <li>Ambassadors</li>
+                <li><a href="#" data-bs-toggle="modal" data-bs-target="#cardModal"
+                   data-bs-title="Kerry"
+                   data-bs-img="/images/kerry.jpg"
+                   data-bs-text="Kerry is our troop's Ambassador leader with over # years of experience guiding Girl Scouts.">Kerry</a>
+                </li>
+                <div class="container mt-5">
+                    <div class="modal fade" id="cardModal" tabindex="-1" aria-labelledby="cardModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="cardModalLabel"></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="" class="img-fluid mb-3" id="cardModalImg" alt="Card Image">
+                                    <p id="cardModalText"></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <li>Seniors</li>
+                <li>Cadettes</li>
+                <li>Juniors</li>
+                <li>Brownies</li>
+                <li>Daisies</li>               
+</ul>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
+            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris...</p>
+        </div>
+    </div>
 </div>

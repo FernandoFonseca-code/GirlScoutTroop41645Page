@@ -1,4 +1,16 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿const cardModal = document.getElementById('cardModal');
+cardModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
 
-// Write your JavaScript code.
+    const title = button.getAttribute('data-bs-title');
+    const img = button.getAttribute('data-bs-img');
+    const text = button.getAttribute('data-bs-text');
+
+    const modalTitle = cardModal.querySelector('.modal-title');
+    const modalImg = cardModal.querySelector('#cardModalImg');
+    const modalText = cardModal.querySelector('#cardModalText');
+
+    modalTitle.textContent = title;
+    modalImg.src = img;
+    modalText.textContent = text;
+});
