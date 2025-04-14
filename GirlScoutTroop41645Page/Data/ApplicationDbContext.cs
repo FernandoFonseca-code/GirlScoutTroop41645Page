@@ -9,4 +9,7 @@ public class ApplicationDbContext : IdentityDbContext
         : base(options)
     {
     }
+
+    public DbSet<GirlScoutTroop41645Page.Models.Scout> Scouts { get; set; } = default!;
+    public DbSet<GirlScoutTroop41645Page.Models.Member> Members { get; set; } = default!;
 }
