@@ -9,5 +9,5 @@ public class Scout
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public DateTime DateOfBirth { get; set; }
-
+    public List<Member> Members { get; set; } = [];
 }

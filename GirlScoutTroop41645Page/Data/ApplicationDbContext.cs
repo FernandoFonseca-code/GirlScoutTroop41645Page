@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using GirlScoutTroop41645Page.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GirlScoutTroop41645Page.Data;
@@ -10,6 +11,6 @@ public class ApplicationDbContext : IdentityDbContext
     {
     }
 
-    public DbSet<GirlScoutTroop41645Page.Models.Scout> Scouts { get; set; } = default!;
-    public DbSet<GirlScoutTroop41645Page.Models.Member> Members { get; set; } = default!;
+    public DbSet<Scout> Scouts { get; set; }
+    public DbSet<Member> Members { get; set; }
 }

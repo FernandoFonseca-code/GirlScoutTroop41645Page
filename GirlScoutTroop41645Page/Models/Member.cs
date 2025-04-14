@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace GirlScoutTroop41645Page.Models;
 
 public class Member : IdentityUser
 {
+    public int MemberId { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Address { get; set; }
@@ -12,4 +14,5 @@ public class Member : IdentityUser
     public string? ZipCode { get; set; }
     public DateTime DateOfBirth { get; set; }
     public bool IsLeader { get; set; } = false;
+    public List<Scout> Scouts { get; set; } = [];
 }
