@@ -1,0 +1,49 @@
+﻿@model GirlScoutTroop41645Page.Models.EmailTestModel
+@{
+    ViewData["Title"] = "Email Test";
+}
+
+<h1>Email Test</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Test" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ToEmail" class="control-label"></label>
+                <input asp-for="ToEmail" class="form-control" />
+                <span asp-validation-for="ToEmail" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Subject" class="control-label"></label>
+                <input asp-for="Subject" class="form-control" />
+                <span asp-validation-for="Subject" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Message" class="control-label"></label>
+                <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Message" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <input type="submit" value="Send Email" class="btn btn-primary" />
+            </div>
+        </form>
+
+        @if (!string.IsNullOrEmpty(Model.ResultMessage))
+        {
+            <div class="alert @(Model.ResultMessage.StartsWith("Error") ? "alert-danger" : "alert-success")">
+                @Html.Raw(Model.ResultMessage)
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
