@@ -19,15 +19,16 @@ public class EmailSender : IEmailSender
     public async Task SendEmailAsync(string toEmail, string subject, string htmlMessage)
     {
         string apiKey = _configuration["ApiSettings:ApiKey"];
+        string sendGrid_Sender = _configuration["SendGrid_Sender:senderEmail"];
         if (string.IsNullOrEmpty(apiKey))
         {
             throw new Exception("SendGrid API Key is null or empty");
         }
 
         var client = new SendGridClient(apiKey);
-        var from = new EmailAddress("noreply@girlscouttroop41645.org", "Girl Scout Troop 41645");
+        var from = new EmailAddress(sendGrid_Sender, "noreply@Girl Scout Troop 41645");
         var to = new EmailAddress(toEmail);
-        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent: null, htmlMessage);
+        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent: "testing this process", htmlMessage);
 
         var response = await client.SendEmailAsync(msg);
 

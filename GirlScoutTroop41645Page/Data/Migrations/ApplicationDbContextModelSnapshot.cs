@@ -41,7 +41,7 @@ namespace GirlScoutTroop41645Page.Data.Migrations
 
                     b.HasKey("ScoutId");
 
-                    b.ToTable("Scouts");
+                    b.ToTable("Scouts", (string)null);
                 });
 
             modelBuilder.Entity("MemberScout", b =>
@@ -56,7 +56,7 @@ namespace GirlScoutTroop41645Page.Data.Migrations
 
                     b.HasIndex("ScoutsScoutId");
 
-                    b.ToTable("MemberScout");
+                    b.ToTable("MemberScout", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

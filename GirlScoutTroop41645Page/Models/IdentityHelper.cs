@@ -4,12 +4,12 @@ namespace GirlScoutTroop41645Page.Models;
 
 public static class IdentityHelper
 {
-    public const string TroopLeader = "TroopLeader";
+    public const string TroopLeader = "Admin";
     public const string Parent = "Parent";
 
     public static async Task CreateRoles(IServiceProvider provider, params string[] roles)
     {
-       RoleManager<IdentityRole> roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
+        RoleManager<IdentityRole> roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
         foreach (string role in roles)
         {
             bool doesRoleExist = await roleManager.RoleExistsAsync(role);
