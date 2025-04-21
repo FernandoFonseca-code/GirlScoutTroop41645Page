@@ -4,6 +4,8 @@ using GirlScoutTroop41645Page.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using GirlScoutTroop41645Page.Services;
 using Microsoft.Extensions.Options;
+using GirlScoutTroop41645Page.Models;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.SignIn.RequireConfirmedAccount = true;
     options.SignIn.RequireConfirmedEmail = true;
 })
+.AddRoles<IdentityRole>() // This line adds role management support
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
@@ -36,7 +39,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     // Lockout settings
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
-    // User settings
+    // Parent settings
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._!@+";
     options.User.RequireUniqueEmail = false;
 });
@@ -68,5 +71,10 @@ app.MapControllerRoute(
 
 app.MapRazorPages()
    .WithStaticAssets();
+// Create default roles
+var serviceProvider = app.Services.GetRequiredService<IServiceProvider>().CreateScope();
+await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader, IdentityHelper.Parent);
+
+//Create default TroopLeader
 
 app.Run();
