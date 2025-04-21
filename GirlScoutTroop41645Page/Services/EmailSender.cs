@@ -26,7 +26,7 @@ public class EmailSender : IEmailSender
         }
 
         var client = new SendGridClient(apiKey);
-        var from = new EmailAddress(sendGrid_Sender, "noreply@Girl Scout Troop 41645");
+        var from = new EmailAddress(sendGrid_Sender, "NoReply@Girl Scout Troop 41645");
         var to = new EmailAddress(toEmail);
         var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent: "testing this process", htmlMessage);
 
