@@ -71,10 +71,12 @@ app.MapControllerRoute(
 
 app.MapRazorPages()
    .WithStaticAssets();
-// Create default roles
-//var serviceProvider = app.Services.GetRequiredService<IServiceProvider>().CreateScope();
-//await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.Admin, IdentityHelper.Parent);
 
-//Create default Admin
+var serviceProvider = app.Services.GetRequiredService<IServiceProvider>().CreateScope();
+// Create roles
+await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader, IdentityHelper.TroopSectionLeader, IdentityHelper.Parent);
+
+//Create default Troop Leader
+await IdentityHelper.CreateDefaultUser(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader);
 
 app.Run();
