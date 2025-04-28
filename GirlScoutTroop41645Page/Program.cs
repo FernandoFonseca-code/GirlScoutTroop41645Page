@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 /// could not be used anymore.
 /// </summary>
 // Set up configuration to use the specific appsettings.json file path
-string appSettingsPath = @"D:\Fernando Fonseca\GirlScoutTroop41645Page\GirlScoutTroop41645Page\AppData\appsettings.json";
+string appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "AppData", "appsettings.json");
 
 // Create a new ConfigurationBuilder and add the file
 var configurationBuilder = new ConfigurationBuilder()
