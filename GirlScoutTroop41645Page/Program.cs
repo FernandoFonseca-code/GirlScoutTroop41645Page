@@ -3,21 +3,39 @@ using Microsoft.EntityFrameworkCore;
 using GirlScoutTroop41645Page.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using GirlScoutTroop41645Page.Services;
-using Microsoft.Extensions.Options;
 using GirlScoutTroop41645Page.Models;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+
 
 var builder = WebApplication.CreateBuilder(args);
+/// <summary>
+/// Lines 14-22 are used because I am using a custom path for the appsettings.json file.
+/// Had to update the path and create a new configuration builder to use the new path as IConfiguration
+/// could not be used anymore.
+/// </summary>
+// Set up configuration to use the specific appsettings.json file path
+string appSettingsPath = @"D:\Fernando Fonseca\GirlScoutTroop41645Page\GirlScoutTroop41645Page\AppData\appsettings.json";
 
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+// Create a new ConfigurationBuilder and add the file
+var configurationBuilder = new ConfigurationBuilder()
+    .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true);
+
+// Build the configuration and add it to the builder
+var configuration = configurationBuilder.Build();
+builder.Configuration.AddConfiguration(configuration);
+
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddHttpContextAccessor();
 
+// Adds Google Calendar services
+builder.Services.AddSingleton<GoogleCalendarService>();
+// Adds email sender service
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+// Adds Identity services
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 { 
     options.SignIn.RequireConfirmedAccount = true;

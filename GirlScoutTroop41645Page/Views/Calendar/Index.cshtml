@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Troop Calendar";
+}
+
+<div class="container">
+    <h1 class="my-4">Troop 41645 Calendar</h1>
+    <p>Stay updated with all troop events and activities.</p>
+
+    <div class="card shadow">
+        <div class="card-body p-0">
+            <div class="calendar-container">
+                <iframe src="@ViewBag.CalendarUrl" style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+@if (User.IsInRole(IdentityHelper.TroopLeader) || User.IsInRole(IdentityHelper.TroopSectionLeader))
+{
+    <div class="text-center mt-4">
+        <a asp-action="Create" class="btn btn-primary">Create New Event</a>
+    </div>
+}
