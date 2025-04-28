@@ -14,3 +14,9 @@
         </div>
     </div>
 </div>
+@if (User.IsInRole(IdentityHelper.TroopLeader) || User.IsInRole(IdentityHelper.TroopSectionLeader))
+{
+    <div class="text-center mt-4">
+        <a asp-action="Create" class="btn btn-primary">Create New Event</a>
+    </div>
+}

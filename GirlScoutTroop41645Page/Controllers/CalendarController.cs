@@ -1,4 +1,6 @@
 ﻿using GirlScoutTroop41645Page.Models;
+using GirlScoutTroop41645Page.Services;
+using Google.Apis.Calendar.v3.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,23 +9,95 @@ namespace GirlScoutTroop41645Page.Controllers;
 [Authorize] // This attribute ensures only logged-in users can access
 public class CalendarController : Controller
 {
-    public IActionResult Index()
+    private readonly GoogleCalendarService _googleCalendarService;
+
+    public CalendarController(GoogleCalendarService googleCalendarService)
     {
-        if (User.IsInRole(IdentityHelper.TroopLeader))
+        _googleCalendarService = googleCalendarService;
+    }
+    public async Task<IActionResult> Index()
+    {
+        try
         {
-            // For Troop Leaders - show calendar with full editing capabilities
-            ViewBag.CalendarUrl = "https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FLos_Angeles&showPrint=0&mode=WEEK&title=GS%20Troop%2041645&src=Z3N0cm9vcDQxNjQ1QGdtYWlsLmNvbQ&src=ZW4udXNhI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23039BE5&color=%230B8043";
+            var service = await _googleCalendarService.GetCalendarServiceAsync();
+
+            // If service is null, we've been redirected to authorization
+            if (service == null) return new EmptyResult();
+
+            var events = await GetUpcomingEventsAsync(service);
+            return View(events);
         }
-        else if (User.IsInRole(IdentityHelper.TroopSectionLeader))
+        catch (Exception ex)
         {
-            // For Section Leaders - show calendar with limited editing
-            ViewBag.CalendarUrl = "https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FLos_Angeles&showPrint=0&mode=AGENDA&title=GS%20Troop%2041645&src=Z3N0cm9vcDQxNjQ1QGdtYWlsLmNvbQ&src=ZW4udXNhI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23039BE5&color=%230B8043";
+            TempData["ErrorMessage"] = $"Calendar error: {ex.Message}";
+            return View(new List<Event>());
         }
-        else
+    }
+
+    private async Task<List<Event>> GetUpcomingEventsAsync(Google.Apis.Calendar.v3.CalendarService service)
+    {
+        string calendarId = _googleCalendarService.GetCalendarId();
+        
+        // Define parameters of the request
+        var request = service.Events.List(calendarId); 
+        request.TimeMinDateTimeOffset = DateTime.Now;
+        request.ShowDeleted = false;
+        request.SingleEvents = true;
+        request.MaxResults = 10;
+        request.OrderBy = Google.Apis.Calendar.v3.EventsResource.ListRequest.OrderByEnum.StartTime;
+
+        // Fetch events
+        var events = await request.ExecuteAsync();
+        return events.Items.ToList();
+    }
+
+    [Authorize(Roles = "TroopLeader,TroopSectionLeader")]
+    public IActionResult Create()
+    {
+        return View(new CalendarEventViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "TroopLeader,TroopSectionLeader")]
+    public async Task<IActionResult> Create(CalendarEventViewModel model)
+    {
+        if (!ModelState.IsValid)
         {
-            // For Parents - read-only view
-            ViewBag.CalendarUrl = "https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FLos_Angeles&showPrint=0&mode=MONTH&title=GS%20Troop%2041645&src=Z3N0cm9vcDQxNjQ1QGdtYWlsLmNvbQ&src=ZW4udXNhI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23039BE5&color=%230B8043";
+            return View(model);
         }
-        return View();
+
+        try
+        {
+            var service = await _googleCalendarService.GetCalendarServiceAsync();
+
+            var newEvent = new Event
+            {
+                Summary = model.Title,
+                Location = model.Location,
+                Description = model.Description,
+                Start = new EventDateTime
+                {
+                    DateTimeDateTimeOffset = model.StartDateTime,
+                    TimeZone = "America/Los_Angeles"
+                },
+                End = new EventDateTime
+                {
+                    DateTimeDateTimeOffset = model.EndDateTime,
+                    TimeZone = "America/Los_Angeles"
+                }
+            };
+
+            // Add event to primary calendar
+            var createdEvent = await service.Events.Insert(newEvent, _googleCalendarService.GetCalendarId()).ExecuteAsync();
+
+            TempData["SuccessMessage"] = "Event created successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", "Error creating event: " + ex.Message);
+            return View(model);
+        }
     }
 }
