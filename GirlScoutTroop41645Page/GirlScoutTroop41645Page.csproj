@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <Folder Include="AppData\GoogleCalendarToken\" />
+    <Folder Include="AppData\GoogleCalendarCredentials\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 

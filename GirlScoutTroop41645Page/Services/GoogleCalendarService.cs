@@ -33,7 +33,7 @@ public class GoogleCalendarService
 
         // Set paths to credentials and tokens
         var appDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AppData");
-        _credentialsPath = Path.Combine(appDataPath, "GoogleCalendarCredentials.json");
+        _credentialsPath = Path.Combine(appDataPath, "GoogleCalendarCredentials");
         _tokenPath = Path.Combine(appDataPath, "GoogleCalendarToken");
         _applicationName = _configuration["GoogleCalendar:ApplicationName"];
         _calendarId = _configuration["GoogleCalendar:CalendarId"];
