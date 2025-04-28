@@ -8,17 +8,35 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2" />
+<<<<<<< HEAD
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
+=======
+    <Content Remove="AppData\GoogleCalendarCredentials.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis.Auth.Mvc" Version="1.62.0" />
+    <PackageReference Include="Google.Apis.Calendar.v3" Version="1.69.0.3746" />
+    <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.68.0.1869" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.4" />
+>>>>>>> e8c3dfb98994720616ed3088c4594dec0897fcc6
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="SendGrid" Version="9.29.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AppData\GoogleCalendarToken\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
