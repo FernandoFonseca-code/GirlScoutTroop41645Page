@@ -1,20 +1,29 @@
 ﻿using GirlScoutTroop41645Page.Models;
 using GirlScoutTroop41645Page.Services;
-using Google.Apis.Calendar.v3.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Google.Apis.Calendar.v3.Data;
+using Microsoft.Extensions.Logging;
 
 namespace GirlScoutTroop41645Page.Controllers;
 
-[Authorize] // This attribute ensures only logged-in users can access
+[Authorize]
 public class CalendarController : Controller
 {
     private readonly GoogleCalendarService _googleCalendarService;
+    private readonly ILogger<CalendarController> _logger;
+    private readonly string _timeZone;
 
-    public CalendarController(GoogleCalendarService googleCalendarService)
+    public CalendarController(
+        GoogleCalendarService googleCalendarService,
+        ILogger<CalendarController> logger,
+        IConfiguration configuration)
     {
         _googleCalendarService = googleCalendarService;
+        _logger = logger;
+        _timeZone = configuration["GoogleCalendar:TimeZone"] ?? "America/Los_Angeles";
     }
+
     public async Task<IActionResult> Index()
     {
         try
@@ -24,37 +33,25 @@ public class CalendarController : Controller
             // If service is null, we've been redirected to authorization
             if (service == null) return new EmptyResult();
 
-            var events = await GetUpcomingEventsAsync(service);
+            var events = await _googleCalendarService.GetUpcomingEventsAsync(10);
             return View(events);
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error loading calendar events");
             TempData["ErrorMessage"] = $"Calendar error: {ex.Message}";
             return View(new List<Event>());
         }
     }
 
-    private async Task<List<Event>> GetUpcomingEventsAsync(Google.Apis.Calendar.v3.CalendarService service)
-    {
-        string calendarId = _googleCalendarService.GetCalendarId();
-        
-        // Define parameters of the request
-        var request = service.Events.List(calendarId); 
-        request.TimeMinDateTimeOffset = DateTime.Now;
-        request.ShowDeleted = false;
-        request.SingleEvents = true;
-        request.MaxResults = 10;
-        request.OrderBy = Google.Apis.Calendar.v3.EventsResource.ListRequest.OrderByEnum.StartTime;
-
-        // Fetch events
-        var events = await request.ExecuteAsync();
-        return events.Items.ToList();
-    }
-
     [Authorize(Roles = "TroopLeader,TroopSectionLeader")]
     public IActionResult Create()
     {
-        return View(new CalendarEventViewModel());
+        return View(new CalendarEventViewModel
+        {
+            StartDateTime = DateTime.Now.AddHours(1),
+            EndDateTime = DateTime.Now.AddHours(2)
+        });
     }
 
     [HttpPost]
@@ -67,37 +64,48 @@ public class CalendarController : Controller
             return View(model);
         }
 
+        if (model.EndDateTime <= model.StartDateTime)
+        {
+            ModelState.AddModelError("EndDateTime", "End time must be after start time");
+            return View(model);
+        }
+
         try
         {
             var service = await _googleCalendarService.GetCalendarServiceAsync();
+            if (service == null) return new EmptyResult();
 
-            var newEvent = new Event
-            {
-                Summary = model.Title,
-                Location = model.Location,
-                Description = model.Description,
-                Start = new EventDateTime
-                {
-                    DateTimeDateTimeOffset = model.StartDateTime,
-                    TimeZone = "America/Los_Angeles"
-                },
-                End = new EventDateTime
-                {
-                    DateTimeDateTimeOffset = model.EndDateTime,
-                    TimeZone = "America/Los_Angeles"
-                }
-            };
-
-            // Add event to primary calendar
-            var createdEvent = await service.Events.Insert(newEvent, _googleCalendarService.GetCalendarId()).ExecuteAsync();
+            var newEvent = MapToEvent(model);
+            var createdEvent = await _googleCalendarService.CreateEventAsync(newEvent);
 
             TempData["SuccessMessage"] = "Event created successfully!";
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error creating calendar event");
             ModelState.AddModelError("", "Error creating event: " + ex.Message);
             return View(model);
         }
+    }
+
+    private Event MapToEvent(CalendarEventViewModel model)
+    {
+        return new Event
+        {
+            Summary = model.Title,
+            Location = model.Location,
+            Description = model.Description,
+            Start = new EventDateTime
+            {
+                DateTimeDateTimeOffset = model.StartDateTime,
+                TimeZone = _timeZone
+            },
+            End = new EventDateTime
+            {
+                DateTimeDateTimeOffset = model.EndDateTime,
+                TimeZone = _timeZone
+            }
+        };
     }
 }

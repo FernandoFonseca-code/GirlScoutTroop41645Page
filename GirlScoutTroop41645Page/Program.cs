@@ -4,24 +4,13 @@ using GirlScoutTroop41645Page.Data;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using GirlScoutTroop41645Page.Services;
 using GirlScoutTroop41645Page.Models;
+using Google.Apis.Auth.AspNetCore3;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Newtonsoft.Json.Linq;
 
 
 var builder = WebApplication.CreateBuilder(args);
-/// <summary>
-/// Lines 14-22 are used because I am using a custom path for the appsettings.json file.
-/// Had to update the path and create a new configuration builder to use the new path as IConfiguration
-/// could not be used anymore.
-/// </summary>
-// Set up configuration to use the specific appsettings.json file path
-string appSettingsPath = Path.Combine(Directory.GetCurrentDirectory(), "AppData", "appsettings.json");
-
-// Create a new ConfigurationBuilder and add the file
-var configurationBuilder = new ConfigurationBuilder()
-    .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true);
-
-// Build the configuration and add it to the builder
-var configuration = configurationBuilder.Build();
-builder.Configuration.AddConfiguration(configuration);
+var secrets = builder.Configuration.GetSection("Google").Get<Dictionary<string, string>>();
 
 // Add services to the container.
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -30,6 +19,26 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthentication(o => 
+{
+    // This forces challenge results to be handled by Google OpenID Handler, so there's no
+    // need to add an AccountController that emits challenges for Login.
+    o.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+    // This forces forbid results to be handled by Google OpenID Handler, which checks if
+    // extra scopes are required and does automatic incremental auth.
+    o.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
+    // Default scheme that will handle everything else.
+    // Once a user is authenticated, the OAuth2 token info is stored in cookies.
+    o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+
+        .AddCookie()
+        .AddGoogleOpenIdConnect(options =>
+        {
+            options.ClientId = secrets["client_id"];
+            options.ClientSecret = secrets["client_secret"];
+            options.CallbackPath = "/signin-google";
+        });
 
 // Adds Google Calendar services
 builder.Services.AddSingleton<GoogleCalendarService>();
@@ -77,7 +86,7 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -91,10 +100,10 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 var serviceProvider = app.Services.GetRequiredService<IServiceProvider>().CreateScope();
-// Create roles
-await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader, IdentityHelper.TroopSectionLeader, IdentityHelper.Parent);
-
-//Create default Troop Leader
-await IdentityHelper.CreateDefaultUser(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader);
+await Task.Run(async () =>
+{
+    await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader, IdentityHelper.TroopSectionLeader, IdentityHelper.Parent);
+    await IdentityHelper.CreateDefaultUser(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader);
+});
 
 app.Run();

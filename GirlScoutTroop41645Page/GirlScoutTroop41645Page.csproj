@@ -9,19 +9,16 @@
 
   <ItemGroup>
 
-    <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
+    <PackageReference Include="Google.Apis.Auth.AspNetCore3" Version="1.69.0" />
 
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
-
-    <Content Remove="AppData\GoogleCalendarCredentials.json" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Apis.Calendar.v3" Version="1.69.0.3746" />
-    <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.68.0.1869" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.4" />
@@ -37,8 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AppData\GoogleCalendarToken\" />
-    <Folder Include="AppData\GoogleCalendarCredentials\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
