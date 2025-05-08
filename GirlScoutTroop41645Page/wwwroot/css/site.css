@@ -22,25 +22,35 @@ html {
 }
 
 body {
-    display: flex;
-    flex-direction: column;
+    display: block;
     min-height: 100vh;
     margin: 0;
     background-color: transparent;
+    /* Add padding to accommodate fixed header and footer */
+    padding-top: 80px; /* Adjust based on header height */
+    padding-bottom: 60px; /* Adjust based on footer height */
 }
 
-/* Main content container */
-.container {
-    flex: 10 auto;
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+
 }
 
-/* Footer styles */
-.footer {
-    flex-shrink: 0;
-    padding: 1rem 0;
-    margin-top: auto;
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ensures footer stays above other content */
 }
-
+.contentFooter {
+    line-height:normal
+}
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
     color: var(--bs-secondary-color);
     text-align: end;
