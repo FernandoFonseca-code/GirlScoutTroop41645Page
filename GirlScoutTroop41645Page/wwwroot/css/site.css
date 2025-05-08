@@ -6,41 +6,50 @@ html {
     height: 100%;
     margin: 0;
     padding: 0;
-    background: url(/images/Background.jpg) no-repeat center center;
+    background: url(/images/Background2.jpg) no-repeat center center;
     background-size: cover;
     background-attachment: fixed;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 body {
-    margin-bottom: 60px;
-    /* Make body transparent to show the html background */
-    background-color: transparent;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
+    margin: 0;
+    background-color: transparent;
+}
+
+/* Main content container */
+.container {
+    flex: 10 auto;
+}
+
+/* Footer styles */
+.footer {
+    flex-shrink: 0;
+    padding: 1rem 0;
+    margin-top: auto;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
 }
+
 .calendar-container {
     border-radius: 8px;
     overflow: hidden;
