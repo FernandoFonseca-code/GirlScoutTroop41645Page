@@ -1,9 +1,5 @@
 {
   "dependencies": {
-    "mssql1": {
-      "type": "mssql",
-      "connectionId": "ConnectionStrings:DefaultConnection"
-    },
     "mssql2": {
       "type": "mssql",
       "connectionId": "ConnectionStrings:DatabaseConnection",
@@ -12,6 +8,19 @@
     "signalr1": {
       "type": "signalr",
       "connectionId": "Azure:SignalR:ConnectionString",
+      "dynamicId": null
+    },
+    "sqlite1": {
+      "ignored": "true",
+      "type": "sqlite"
+    },
+    "mssql1": {
+      "ignored": "true",
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:DefaultConnection"
+    },
+    "secrets1": {
+      "type": "secrets",
       "dynamicId": null
     }
   }
