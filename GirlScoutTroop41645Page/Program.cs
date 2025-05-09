@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 var secrets = builder.Configuration.GetSection("Google").Get<Dictionary<string, string>>();
 
 // Add services to the container.
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
