@@ -11,7 +11,7 @@ using Microsoft.Azure.SignalR;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var secrets = builder.Configuration.GetSection("Google").Get<Dictionary<string, string>>();
+var secrets = builder.Configuration.GetSection("GoogleCalendar").Get<Dictionary<string, string>>();
 
 // Add services to the container.
 string connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
@@ -36,8 +36,8 @@ builder.Services.AddAuthentication(o =>
         .AddCookie()
         .AddGoogleOpenIdConnect(options =>
         {
-            options.ClientId = secrets["client_id"];
-            options.ClientSecret = secrets["client_secret"];
+            options.ClientId = secrets["ClientId"];
+            options.ClientSecret = secrets["ClientSecret"];
             options.CallbackPath = "/signin-google";
         });
 

@@ -9,13 +9,13 @@ using Google.Apis.Util.Store;
 public class GoogleCalendarService
 {
     private readonly IConfiguration _configuration;
-    private readonly string _tokenPath;
+    private readonly string _tokenPath = "D:\\Fernando Fonseca\\GirlScoutTroop41645Page\\GirlScoutTroop41645Page\\AppData\\Token.json";
     private readonly string[] _scopes = { CalendarService.Scope.Calendar };
     private readonly string _clientId;
     private readonly string _clientSecret;
     private readonly string _calendarId;
     private readonly string _applicationName;
-    private readonly string _redirectUri = "https://127.0.0.1:8001/authorize/";
+    private readonly string _redirectUri;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<GoogleCalendarService> _logger;
 
@@ -27,18 +27,8 @@ public class GoogleCalendarService
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
-
-        // Use a directory in the app for tokens
-        _tokenPath = _configuration["Google:calendar_token"];
-
-        // Make sure the directory exists
-        if (!Directory.Exists(_tokenPath))
-        {
-            Directory.CreateDirectory(_tokenPath);
-        }
-
-        _clientId = _configuration["Google:client_id"];
-        _clientSecret = _configuration["Google:client_secret"];
+        _clientId = _configuration["GoogleCalendar:ClientId"];
+        _clientSecret = _configuration["GoogleCalendar:ClientSecret"];
         _applicationName = _configuration["GoogleCalendar:ApplicationName"];
         _calendarId = _configuration["GoogleCalendar:CalendarId"];
     }
