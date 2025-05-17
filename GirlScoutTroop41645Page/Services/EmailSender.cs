@@ -18,7 +18,7 @@ public class EmailSender : IEmailSender
 
     public async Task SendEmailAsync(string toEmail, string subject, string htmlMessage)
     {
-        string apiKey = _configuration["ApiSettings:ApiKey"];
+        string apiKey = _configuration["SendGrid_Sender:ApiKey"];
         string sendGrid_Sender = _configuration["SendGrid_Sender:senderEmail"];
         if (string.IsNullOrEmpty(apiKey))
         {
