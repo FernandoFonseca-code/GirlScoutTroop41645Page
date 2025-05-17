@@ -9,40 +9,17 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Newtonsoft.Json.Linq;
 using Microsoft.Azure.SignalR;
 
-
 var builder = WebApplication.CreateBuilder(args);
-var secrets = builder.Configuration.GetSection("Google").Get<Dictionary<string, string>>();
 
 // Add services to the container.
 string connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication(o => 
-{
-    // This forces challenge results to be handled by Google OpenID Handler, so there's no
-    // need to add an AccountController that emits challenges for Login.
-    o.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-    // This forces forbid results to be handled by Google OpenID Handler, which checks if
-    // extra scopes are required and does automatic incremental auth.
-    o.DefaultForbidScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-    // Default scheme that will handle everything else.
-    // Once a user is authenticated, the OAuth2 token info is stored in cookies.
-    o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
 
-        .AddCookie()
-        .AddGoogleOpenIdConnect(options =>
-        {
-            options.ClientId = secrets["client_id"];
-            options.ClientSecret = secrets["client_secret"];
-            options.CallbackPath = "/signin-google";
-        });
-
-// Adds Google Calendar services
-builder.Services.AddSingleton<GoogleCalendarService>();
 // Adds email sender service
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 // Adds Identity services
@@ -71,7 +48,11 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._!@+";
     options.User.RequireUniqueEmail = false;
 });
+
 builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration["Azure:SignalR:ConnectionString"]!);
+// Add Google authentication
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
