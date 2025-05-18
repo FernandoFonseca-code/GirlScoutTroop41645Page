@@ -26,22 +26,7 @@ public class CalendarController : Controller
 
     public async Task<IActionResult> Index()
     {
-        try
-        {
-            var service = await _googleCalendarService.GetCalendarServiceAsync();
-
-            // If service is null, we've been redirected to authorization
-            if (service == null) return new EmptyResult();
-
-            var events = await _googleCalendarService.GetUpcomingEventsAsync(10);
-            return View(events);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading calendar events");
-            TempData["ErrorMessage"] = $"Calendar error: {ex.Message}";
-            return View(new List<Event>());
-        }
+        return View();
     }
 
     [Authorize(Roles = "TroopLeader,TroopSectionLeader")]
@@ -55,7 +40,6 @@ public class CalendarController : Controller
     }
 
     [HttpPost]
-    [ValidateAntiForgeryToken]
     [Authorize(Roles = "TroopLeader,TroopSectionLeader")]
     public async Task<IActionResult> Create(CalendarEventViewModel model)
     {
