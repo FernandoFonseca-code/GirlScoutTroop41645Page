@@ -139,8 +139,34 @@ namespace GirlScoutTroop41645Page.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(
+                        Input.Email, "Confirm your Girl Scout Troop 41645 Account",
+                        $@"<html>
+                                <head>
+                                    <style>
+                                        body {{ font-family: Arial, sans-serif; line-height: 1.6; }}
+                                        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                                        .header {{ background-color: #00ae58; color: white; padding: 10px; text-align: center; }}
+                                        .content {{ padding: 20px; }}
+                                        .button {{ display: inline-block; padding: 10px 20px; background-color: #00ae58; color: white; 
+                                                  text-decoration: none; border-radius: 5px; }}
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class='container'>
+                                        <div class='header'>
+                                            <h1>Girl Scout Troop 41645</h1>
+                                        </div>
+                                        <div class='content'>
+                                            <h2>Welcome to Our Troop!</h2>
+                                            <p>Thank you for registering with Girl Scout Troop 41645. To complete your registration, please confirm your email address.</p>
+                                            <p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}' class='button'>Confirm Email Address</a></p>
+                                            <p>If you did not request this email, please ignore it.</p>
+                                            <p>Thank you,<br>Girl Scout Troop 41645</p>
+                                        </div>
+                                    </div>
+                                </body>
+                            </html>");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
