@@ -128,7 +128,7 @@ namespace GirlScoutTroop41645Page.Data.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("SendEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 

@@ -77,7 +77,7 @@ namespace GirlScoutTroop41645Page.Areas.Identity.Pages.Account
             /// </summary>
             [Required]
             [EmailAddress]
-            [Display(Name = "Email")]
+            [Display(Name = "SendEmail")]
             public string Email { get; set; }
             
             [Required]

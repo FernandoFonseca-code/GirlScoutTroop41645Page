@@ -84,7 +84,7 @@ namespace GirlScoutTroop41645Page.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("SendEmail")
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 

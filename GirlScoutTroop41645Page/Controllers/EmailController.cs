@@ -4,33 +4,33 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GirlScoutTroop41645Page.Controllers;
 
-public class EmailTestController : Controller
+public class EmailController : Controller
 {
     private readonly IEmailSender _emailSender;
-    private readonly ILogger<EmailTestController> _logger;
+    private readonly ILogger<EmailController> _logger;
 
-    public EmailTestController(IEmailSender emailSender, ILogger<EmailTestController> logger)
+    public EmailController(IEmailSender emailSender, ILogger<EmailController> logger)
     {
         _emailSender = emailSender;
         _logger = logger;
     }
 
-    // GET: Email/Test
-    public IActionResult Test()
+    // GET: SendEmail/SendEmail
+    public IActionResult SendEmail()
     {
-        var model = new EmailTestModel
+        var model = new EmailModel
         {
-            Subject = "Test Email from Girl Scout Troop 41645",
-            Message = "<p>This is a <strong>test email</strong> from the Girl Scout Troop application.</p>"
+            Subject = "Write your Email Subject",
+            Message = "Write your message here"
         };
 
         return View(model);
     }
 
-    // POST: Email/Test
+    // POST: SendEmail/SendEmail
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Test(EmailTestModel model)
+    public async Task<IActionResult> Test(EmailModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -44,13 +44,13 @@ public class EmailTestController : Controller
                 model.Subject,
                 model.Message);
 
-            model.ResultMessage = $"Email sent successfully to {model.ToEmail}!";
-            _logger.LogInformation("Test email sent to {Email}", model.ToEmail);
+            model.ResultMessage = $"SendEmail sent successfully to {model.ToEmail}!";
+            _logger.LogInformation("SendEmail email sent to {SendEmail}", model.ToEmail);
         }
         catch (Exception ex)
         {
             model.ResultMessage = $"Error sending email: {ex.Message}";
-            _logger.LogError(ex, "Error sending test email to {Email}", model.ToEmail);
+            _logger.LogError(ex, "Error sending test email to {SendEmail}", model.ToEmail);
         }
 
         return View(model);

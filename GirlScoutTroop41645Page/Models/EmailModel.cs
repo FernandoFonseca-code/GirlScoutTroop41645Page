@@ -2,11 +2,11 @@
 
 namespace GirlScoutTroop41645Page.Models;
 
-public class EmailTestModel
+public class EmailModel
 {
-    [Required(ErrorMessage = "Email address is required")]
+    [Required(ErrorMessage = "SendEmail address is required")]
     [EmailAddress]
-    [Display(Name = "To Email")]
+    [Display(Name = "To SendEmail")]
     public string ToEmail { get; set; } = string.Empty;
 
     [Display(Name = "Subject")]
