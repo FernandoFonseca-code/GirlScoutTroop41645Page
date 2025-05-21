@@ -1,25 +1,30 @@
 ﻿using GirlScoutTroop41645Page.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GirlScoutTroop41645Page.Controllers;
 
 public class EmailController : Controller
 {
+    private readonly UserManager<Member> _userManager;
     private readonly IEmailSender _emailSender;
     private readonly ILogger<EmailController> _logger;
 
-    public EmailController(IEmailSender emailSender, ILogger<EmailController> logger)
+    public EmailController(UserManager<Member> userManager, IEmailSender emailSender, ILogger<EmailController> logger)
     {
+        _userManager = userManager;
         _emailSender = emailSender;
         _logger = logger;
     }
 
-    // GET: SendEmail/SendEmail
-    public IActionResult SendEmail()
+    // GET: Email/Send
+    public IActionResult Send()
     {
         var model = new EmailModel
         {
+            AvailableEmails = GetUserEmails(),
             Subject = "Write your Email Subject",
             Message = "Write your message here"
         };
@@ -27,32 +32,51 @@ public class EmailController : Controller
         return View(model);
     }
 
-    // POST: SendEmail/SendEmail
+    // POST: Email/Send
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Test(EmailModel model)
+    public async Task<IActionResult> Send(EmailModel model)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
         try
         {
-            await _emailSender.SendEmailAsync(
-                model.ToEmail,
-                model.Subject,
-                model.Message);
+            if (model.ToEmails == null || !model.ToEmails.Any())
+            {
+                model.ResultMessage = "No recipient/s selected.";
+                model.AvailableEmails = GetUserEmails();
+                return View(model);
+            }
 
-            model.ResultMessage = $"SendEmail sent successfully to {model.ToEmail}!";
-            _logger.LogInformation("SendEmail email sent to {SendEmail}", model.ToEmail);
+            // Option 1: Send individual emails to each recipient
+            foreach (var recipientEmail in model.ToEmails)
+            {
+                await _emailSender.SendEmailAsync(
+                    recipientEmail,
+                    model.Subject,
+                    model.Message);
+
+                _logger.LogInformation("Email sent to {RecipientEmail}", recipientEmail);
+            }
+
+            model.ResultMessage = $"Email sent successfully to {model.ToEmails.Count} recipients!";
         }
         catch (Exception ex)
         {
             model.ResultMessage = $"Error sending email: {ex.Message}";
-            _logger.LogError(ex, "Error sending test email to {SendEmail}", model.ToEmail);
+            _logger.LogError(ex, "Error sending email to multiple recipients");
         }
 
+        model.AvailableEmails = GetUserEmails();
         return View(model);
+    }
+
+    private List<SelectListItem> GetUserEmails()
+    {
+        var users = _userManager.Users.ToList();
+        return users.Select(u => new SelectListItem
+        {
+            Value = u.Email,
+            Text = $"{u.FirstName} {u.LastName} ({u.Email})"
+        }).ToList();
+
     }
 }

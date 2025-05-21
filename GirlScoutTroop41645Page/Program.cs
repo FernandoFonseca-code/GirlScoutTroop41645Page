@@ -46,7 +46,7 @@ builder.Services.AddSingleton<GoogleCalendarService>();
 // Adds email sender service
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 // Adds Identity services
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+builder.Services.AddDefaultIdentity<Member>(options =>
 { 
     options.SignIn.RequireConfirmedAccount = true;
     options.SignIn.RequireConfirmedEmail = true;
@@ -102,10 +102,10 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 var serviceProvider = app.Services.GetRequiredService<IServiceProvider>().CreateScope();
-await Task.Run(async () =>
-{
-    await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader, IdentityHelper.TroopSectionLeader, IdentityHelper.Parent);
-    await IdentityHelper.CreateDefaultUser(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader);
-});
+//await Task.Run(async () =>
+//{
+//    await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader, IdentityHelper.TroopSectionLeader, IdentityHelper.Parent);
+//    await IdentityHelper.CreateDefaultUser(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader);
+//});
 
 app.Run();

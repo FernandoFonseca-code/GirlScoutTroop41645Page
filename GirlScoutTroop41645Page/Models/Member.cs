@@ -12,6 +12,5 @@ public class Member : IdentityUser
     public string? State { get; set; }
     public string? ZipCode { get; set; }
     public DateTime DateOfBirth { get; set; }
-    public bool IsLeader { get; set; } = false;
     public List<Scout> Scouts { get; set; } = [];
 }

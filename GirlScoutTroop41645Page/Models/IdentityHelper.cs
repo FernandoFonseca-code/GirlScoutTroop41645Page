@@ -24,22 +24,21 @@ public class IdentityHelper
 
     public static async Task CreateDefaultUser(IServiceProvider provider, string role)
     {
-        var UserManager = provider.GetService<UserManager<IdentityUser>>();
-        var configuration = provider.GetService<IConfiguration>();
+        var UserManager = provider.GetRequiredService<UserManager<Member>>();
+        var configuration = provider.GetRequiredService<IConfiguration>();
 
-        string password = configuration["TroopLeaderPassword:password"];
+        string password = configuration["GoogleCalendar:TroopLeaderPassword"];
         // checks to see how many users are in the specified role
         int numUsers = (await UserManager.GetUsersInRoleAsync(role)).Count();
         if (numUsers == 0)
         {
-            var defaultUser = new IdentityUser()
+            var defaultUser = new Member()
             {
                 Email = "gstroop41645@gmail.com",
                 UserName = "TroopLeader",
                 EmailConfirmed = true,
             };
-            await UserManager.CreateAsync(defaultUser,password);
-
+            await UserManager.CreateAsync(defaultUser, password);
             await UserManager.AddToRoleAsync(defaultUser, role);
         }
     }

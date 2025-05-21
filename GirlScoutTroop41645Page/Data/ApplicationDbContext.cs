@@ -5,7 +5,7 @@ using System.Configuration;
 
 namespace GirlScoutTroop41645Page.Data;
 
-public class ApplicationDbContext : IdentityDbContext
+public class ApplicationDbContext : IdentityDbContext<Member>
 {
     private readonly IConfiguration _configuration;
 
