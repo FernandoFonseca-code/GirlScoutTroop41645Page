@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using GirlScoutTroop41645Page.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,11 +14,11 @@ namespace GirlScoutTroop41645Page.Areas.Identity.Pages.Account.Manage
 {
     public class Disable2faModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<Member> _userManager;
         private readonly ILogger<Disable2faModel> _logger;
 
         public Disable2faModel(
-            UserManager<IdentityUser> userManager,
+            UserManager<Member> userManager,
             ILogger<Disable2faModel> logger)
         {
             _userManager = userManager;

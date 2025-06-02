@@ -47,7 +47,7 @@ builder.Services.AddSingleton<GoogleCalendarService>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 // Adds Identity services
 builder.Services.AddDefaultIdentity<Member>(options =>
-{ 
+{
     options.SignIn.RequireConfirmedAccount = true;
     options.SignIn.RequireConfirmedEmail = true;
 })
