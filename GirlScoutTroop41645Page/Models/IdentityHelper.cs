@@ -4,6 +4,7 @@ namespace GirlScoutTroop41645Page.Models;
 
 public class IdentityHelper
 {
+    public const string Admin = "Admin";
     public const string TroopLeader = "TroopLeader";
     public const string TroopSectionLeader = "TroopSectionLeader";
     public const string Parent = "Parent";

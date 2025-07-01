@@ -29,7 +29,7 @@ public class CalendarController : Controller
         return View();
     }
 
-    [Authorize(Roles = "TroopLeader,TroopSectionLeader")]
+    [Authorize(Roles = "Admin,TroopLeader,TroopSectionLeader")]
     public IActionResult Create()
     {
         return View(new CalendarEventViewModel
@@ -40,7 +40,7 @@ public class CalendarController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "TroopLeader,TroopSectionLeader")]
+    [Authorize(Roles = "Admin,TroopLeader,TroopSectionLeader")]
     public async Task<IActionResult> Create(CalendarEventViewModel model)
     {
         if (!ModelState.IsValid)

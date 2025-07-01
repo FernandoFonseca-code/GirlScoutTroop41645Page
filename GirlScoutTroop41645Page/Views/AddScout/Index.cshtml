@@ -1,0 +1,47 @@
+@model List<Scout>
+@{
+    ViewData["Title"] = "Scouts";
+}
+
+<div class="container">
+    <h1 class="my-4">Troop 41645 Scouts</h1>
+    <p>Manage troop scouts and their information.</p>
+
+    @if (Model.Any())
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Date of Birth</th>
+                                <th>Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var scout in Model)
+                            {
+                                <tr>
+                                    <td>@scout.FirstName</td>
+                                    <td>@scout.LastName</td>
+                                    <td>@scout.DateOfBirth.ToShortDateString()</td>
+                                    <td>@scout.Level</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <h4>No scouts found</h4>
+            <p>There are currently no scouts registered in the system.</p>
+        </div>
+    }
+</div>

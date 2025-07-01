@@ -39,7 +39,7 @@
                             </li>
                         }
 
-                        @if (User.IsInRole("TroopLeader") || User.IsInRole("TroopSectionLeader"))
+                        @if (User.IsInRole("Admin") || User.IsInRole("TroopLeader") || User.IsInRole("TroopSectionLeader"))
                         {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Email" asp-action="Send">Email</a>

@@ -104,7 +104,7 @@ app.MapRazorPages()
 var serviceProvider = app.Services.GetRequiredService<IServiceProvider>().CreateScope();
 //await Task.Run(async () =>
 //{
-//    await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader, IdentityHelper.TroopSectionLeader, IdentityHelper.Parent);
+//    await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.Admin, IdentityHelper.TroopLeader, IdentityHelper.TroopSectionLeader, IdentityHelper.Parent);
 //    await IdentityHelper.CreateDefaultUser(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader);
 //});
 
