@@ -38,8 +38,20 @@ public class IdentityHelper
                 UserName = "TroopLeader",
                 EmailConfirmed = true,
             };
-            await UserManager.CreateAsync(defaultUser, password);
-            await UserManager.AddToRoleAsync(defaultUser, role);
+
+            var createResult = await UserManager.CreateAsync(defaultUser, password);
+            if (createResult.Succeeded)
+            {
+                await UserManager.AddToRoleAsync(defaultUser, role);
+            }
+            else
+            {
+                // Log the errors or handle them appropriately
+                foreach (var error in createResult.Errors)
+                {
+                    Console.WriteLine($"Error creating user: {error.Description}");
+                }
+            }
         }
     }
 }
