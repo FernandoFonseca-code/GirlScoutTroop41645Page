@@ -1,0 +1,75 @@
+@model GirlScoutTroop41645Page.Models.Member
+
+@{
+    ViewData["Title"] = "Member Details";
+}
+
+<div class="container">
+    <h1 class="my-4">Member Details</h1>
+
+    <div class="card shadow">
+        <div class="card-header">
+            <h5 class="mb-0">@Model.FirstName @Model.LastName</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-muted">Personal Information</h6>
+                    <dl class="row">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">@Model.FirstName @Model.LastName</dd>
+                        
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">@Model.Email</dd>
+                        
+                        <dt class="col-sm-4">Phone</dt>
+                        <dd class="col-sm-8">@Model.PhoneNumber</dd>
+                        
+                        <dt class="col-sm-4">Date of Birth</dt>
+                        <dd class="col-sm-8">@(Model.DateOfBirth?.ToString("MM/dd/yyyy") ?? "Not provided")</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted">Address</h6>
+                    <dl class="row">
+                        <dt class="col-sm-4">Street</dt>
+                        <dd class="col-sm-8">@Model.Address</dd>
+                        
+                        <dt class="col-sm-4">City</dt>
+                        <dd class="col-sm-8">@Model.City</dd>
+                        
+                        <dt class="col-sm-4">State</dt>
+                        <dd class="col-sm-8">@Model.State</dd>
+                        
+                        <dt class="col-sm-4">Zip Code</dt>
+                        <dd class="col-sm-8">@Model.ZipCode</dd>
+                    </dl>
+                </div>
+            </div>
+
+            @if (Model.Scouts != null && Model.Scouts.Any())
+            {
+                <hr />
+                <h6 class="text-muted">Associated Scouts</h6>
+                <ul class="list-group">
+                    @foreach (var scout in Model.Scouts)
+                    {
+                        <li class="list-group-item">
+                            @scout.FirstName @scout.LastName - @scout.Level
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+        <div class="card-footer">
+            <div class="btn-group">
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                @if (User.IsInRole("Admin") || User.Identity.Name == Model.UserName)
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
