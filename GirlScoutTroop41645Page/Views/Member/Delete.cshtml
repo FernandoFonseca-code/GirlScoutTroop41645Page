@@ -1,0 +1,52 @@
+@model GirlScoutTroop41645Page.Models.Member
+
+@{
+    ViewData["Title"] = "Delete Member";
+}
+
+<div class="container">
+    <h1 class="my-4">Delete Member</h1>
+    
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Warning!</h4>
+        <p>Are you sure you want to delete this member? This action cannot be undone.</p>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header">
+            <h5 class="mb-0">Member Details</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.FirstName @Model.LastName</dd>
+                
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+                
+                <dt class="col-sm-3">Phone</dt>
+                <dd class="col-sm-9">@Model.PhoneNumber</dd>
+                
+                <dt class="col-sm-3">Address</dt>
+                <dd class="col-sm-9">@Model.Address, @Model.City, @Model.State @Model.ZipCode</dd>
+            </dl>
+            
+            @if (Model.Scouts != null && Model.Scouts.Any())
+            {
+                <div class="alert alert-warning">
+                    <p><strong>Note:</strong> This member has @Model.Scouts.Count() associated scout(s).</p>
+                    <p>Deleting this member will affect the association with these scouts.</p>
+                </div>
+            }
+        </div>
+        <div class="card-footer">
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="btn-group">
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
