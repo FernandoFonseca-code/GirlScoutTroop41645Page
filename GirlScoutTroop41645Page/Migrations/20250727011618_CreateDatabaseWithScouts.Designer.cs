@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GirlScoutTroop41645Page.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250721211606_CreateDatabase")]
-    partial class CreateDatabase
+    [Migration("20250727011618_CreateDatabaseWithScouts")]
+    partial class CreateDatabaseWithScouts
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.5")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
