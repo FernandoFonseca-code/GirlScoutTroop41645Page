@@ -11,6 +11,6 @@ public class Member : IdentityUser
     public string? City { get; set; }
     public string? State { get; set; }
     public string? ZipCode { get; set; }
-    public DateTime? DateOfBirth { get; set; }
-    public List<Scout> Scouts { get; set; } = [];
+    public DateOnly? DateOfBirth { get; set; }
+    public List<Scout> Scouts { get; set; } = new List<Scout>();
 }
