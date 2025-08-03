@@ -4,6 +4,7 @@
     ViewData["Title"] = "Leader Dashboard";
     var memberRoles = ViewBag.MemberRoles as Dictionary<string, IList<string>>;
     var availableRoles = ViewBag.AvailableRoles as SelectList;
+    var troopLevels = ViewBag.TroopLevels as List<dynamic>;
 }
 
 <div class="container">
@@ -46,6 +47,7 @@
                             <th>Member</th>
                             <th>Email</th>
                             <th>Current Roles</th>
+                            <th>Subcategories</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -53,6 +55,11 @@
                         @foreach (var member in Model)
                         {
                             var roles = memberRoles?.ContainsKey(member.Id) == true ? memberRoles[member.Id] : new List<string>();
+                            var isTroopSectionLeader = roles.Contains("TroopSectionLeader");
+                            var subcategories = !string.IsNullOrEmpty(member.TroopLevelSubcategories) 
+                                ? member.TroopLevelSubcategories.Split(',').ToList() 
+                                : new List<string>();
+                            
                             <tr>
                                 <td>
                                     <strong>@member.FirstName @member.LastName</strong>
@@ -83,6 +90,49 @@
                                     else
                                     {
                                         <span class="text-muted">No roles assigned</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (isTroopSectionLeader)
+                                    {
+                                        @if (subcategories.Any())
+                                        {
+                                            @foreach (var subcategory in subcategories)
+                                            {
+                                                <span class="badge bg-info me-1">@subcategory</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No subcategories assigned</span>
+                                        }
+                                        
+                                        <!-- Subcategory Management Form -->
+                                        <div class="mt-2">
+                                            <form asp-action="AssignSubcategories" method="post" class="subcategory-form">
+                                                <input type="hidden" name="memberId" value="@member.Id" />
+                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                    @foreach (var level in troopLevels)
+                                                    {
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" 
+                                                                   name="subcategories" value="@level.Value" 
+                                                                   id="@(member.Id)_@level.Value"
+                                                                   @(subcategories.Contains(level.Value.ToString()) ? "checked" : "")
+                                                                   onchange="limitSubcategorySelection(this)" />
+                                                            <label class="form-check-label small" for="@(member.Id)_@level.Value">
+                                                                @level.Text
+                                                            </label>
+                                                        </div>
+                                                    }
+                                                    <button type="submit" class="btn btn-sm btn-outline-info">Update</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not applicable</span>
                                     }
                                 </td>
                                 <td>
@@ -118,7 +168,7 @@
                 </div>
                 <div class="col-md-4">
                     <h6><span class="badge bg-info">Troop Section Leader</span></h6>
-                    <p class="small">Can manage scouts within their assigned section/level (Brownies, Juniors, etc.).</p>
+                    <p class="small">Can manage scouts within their assigned section/level. Can be assigned up to 2 subcategories from: Daisy, Brownie, Junior, Cadette, Senior, Ambassador.</p>
                 </div>
                 <div class="col-md-4">
                     <h6><span class="badge bg-secondary">Parent</span></h6>
@@ -135,5 +185,16 @@
         setTimeout(function() {
             $('.alert').fadeOut();
         }, 5000);
+        
+        // Limit subcategory selection to maximum 2
+        function limitSubcategorySelection(checkbox) {
+            const form = checkbox.closest('.subcategory-form');
+            const checkboxes = form.querySelectorAll('input[name="subcategories"]:checked');
+            
+            if (checkboxes.length > 2) {
+                checkbox.checked = false;
+                alert('A member can have maximum 2 troop level subcategories.');
+            }
+        }
     </script>
 }

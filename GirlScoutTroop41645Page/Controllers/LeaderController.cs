@@ -40,6 +40,10 @@ namespace GirlScoutTroop41645Page.Controllers
                 new { Value = IdentityHelper.TroopSectionLeader, Text = "Troop Section Leader" },
                 new { Value = IdentityHelper.Parent, Text = "Parent" }
             }, "Value", "Text");
+            
+            ViewBag.TroopLevels = Enum.GetValues<TroopLevel>()
+                .Select(level => new { Value = level.ToString(), Text = level.ToString() })
+                .ToList();
 
             return View(members);
         }
@@ -118,11 +122,82 @@ namespace GirlScoutTroop41645Page.Controllers
             var result = await _userManager.RemoveFromRoleAsync(member, role);
             if (result.Succeeded)
             {
+                // If removing TroopSectionLeader role, also clear subcategories
+                if (role == IdentityHelper.TroopSectionLeader)
+                {
+                    member.TroopLevelSubcategories = null;
+                    await _userManager.UpdateAsync(member);
+                }
+                
                 TempData["Success"] = $"Successfully removed {role} role from {member.FirstName} {member.LastName}.";
             }
             else
             {
                 TempData["Error"] = $"Failed to remove role: {string.Join(", ", result.Errors.Select(e => e.Description))}";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+        
+        // POST: Leader/AssignSubcategories
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignSubcategories(string memberId, List<string> subcategories)
+        {
+            if (string.IsNullOrEmpty(memberId))
+            {
+                TempData["Error"] = "Invalid member selection.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var member = await _userManager.FindByIdAsync(memberId);
+            if (member == null)
+            {
+                TempData["Error"] = "Member not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Check if member has TroopSectionLeader role
+            if (!await _userManager.IsInRoleAsync(member, IdentityHelper.TroopSectionLeader))
+            {
+                TempData["Error"] = "Member must have TroopSectionLeader role to assign subcategories.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Validate subcategories (max 2)
+            if (subcategories != null && subcategories.Count > 2)
+            {
+                TempData["Error"] = "A member can have maximum 2 troop level subcategories.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Validate that all subcategories are valid troop levels
+            var validLevels = Enum.GetNames<TroopLevel>();
+            var invalidSubcategories = subcategories?.Where(s => !validLevels.Contains(s)).ToList();
+            if (invalidSubcategories?.Any() == true)
+            {
+                TempData["Error"] = $"Invalid subcategories: {string.Join(", ", invalidSubcategories)}";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Update member's subcategories
+            member.TroopLevelSubcategories = subcategories?.Any() == true ? string.Join(",", subcategories) : null;
+            
+            var result = await _userManager.UpdateAsync(member);
+            if (result.Succeeded)
+            {
+                if (subcategories?.Any() == true)
+                {
+                    TempData["Success"] = $"Successfully assigned subcategories ({string.Join(", ", subcategories)}) to {member.FirstName} {member.LastName}.";
+                }
+                else
+                {
+                    TempData["Success"] = $"Successfully cleared subcategories for {member.FirstName} {member.LastName}.";
+                }
+            }
+            else
+            {
+                TempData["Error"] = $"Failed to update subcategories: {string.Join(", ", result.Errors.Select(e => e.Description))}";
             }
 
             return RedirectToAction(nameof(Index));
