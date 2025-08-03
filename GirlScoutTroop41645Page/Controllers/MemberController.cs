@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GirlScoutTroop41645Page.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "TroopLeader, TroopSectionLeader")]
     public class MemberController : Controller
     {
         private readonly ApplicationDbContext _context;
