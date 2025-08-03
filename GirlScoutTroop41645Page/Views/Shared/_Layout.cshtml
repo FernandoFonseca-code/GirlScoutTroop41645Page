@@ -48,6 +48,13 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Email" asp-action="Send">Email</a>
                         </li>
                         }
+
+                        @if (User.IsInRole("TroopLeader"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Leader" asp-action="Index">Leader</a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
