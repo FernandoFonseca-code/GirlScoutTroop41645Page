@@ -1,0 +1,139 @@
+@model IEnumerable<GirlScoutTroop41645Page.Models.Member>
+
+@{
+    ViewData["Title"] = "Leader Dashboard";
+    var memberRoles = ViewBag.MemberRoles as Dictionary<string, IList<string>>;
+    var availableRoles = ViewBag.AvailableRoles as SelectList;
+}
+
+<div class="container">
+    <h1 class="my-4">Leader Dashboard</h1>
+    
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    @if (TempData["Warning"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @TempData["Warning"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Member Role Management</h5>
+            <small class="text-muted">Manage roles and permissions for all troop members</small>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Email</th>
+                            <th>Current Roles</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var member in Model)
+                        {
+                            var roles = memberRoles?.ContainsKey(member.Id) == true ? memberRoles[member.Id] : new List<string>();
+                            <tr>
+                                <td>
+                                    <strong>@member.FirstName @member.LastName</strong>
+                                    @if (!string.IsNullOrEmpty(member.PhoneNumber))
+                                    {
+                                        <br><small class="text-muted">@member.PhoneNumber</small>
+                                    }
+                                </td>
+                                <td>@member.Email</td>
+                                <td>
+                                    @if (roles.Any())
+                                    {
+                                        @foreach (var role in roles)
+                                        {
+                                            <span class="badge bg-secondary me-1">@role</span>
+                                            <form asp-action="RemoveRole" method="post" class="d-inline">
+                                                <input type="hidden" name="memberId" value="@member.Id" />
+                                                <input type="hidden" name="role" value="@role" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1" 
+                                                        onclick="return confirm('Are you sure you want to remove the @role role from @member.FirstName @member.LastName?')"
+                                                        title="Remove @role role">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </form>
+                                            <br />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No roles assigned</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-action="AssignRole" method="post" class="d-flex align-items-center">
+                                        <input type="hidden" name="memberId" value="@member.Id" />
+                                        <select name="role" class="form-select form-select-sm me-2" style="width: auto;">
+                                            <option value="">Select Role</option>
+                                            @foreach (var availableRole in availableRoles)
+                                            {
+                                                <option value="@availableRole.Value">@availableRole.Text</option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-success">Assign</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header">
+            <h5 class="mb-0">Role Descriptions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6><span class="badge bg-primary">Troop Leader</span></h6>
+                    <p class="small">Full administrative access. Can manage all members, scouts, and assign roles.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6><span class="badge bg-info">Troop Section Leader</span></h6>
+                    <p class="small">Can manage scouts within their assigned section/level (Brownies, Juniors, etc.).</p>
+                </div>
+                <div class="col-md-4">
+                    <h6><span class="badge bg-secondary">Parent</span></h6>
+                    <p class="small">Can add and manage scouts linked to their account. View-only access to their scouts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
+    </script>
+}
