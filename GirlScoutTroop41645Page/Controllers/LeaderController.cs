@@ -41,9 +41,16 @@ namespace GirlScoutTroop41645Page.Controllers
                 new { Value = IdentityHelper.Parent, Text = "Parent" }
             }, "Value", "Text");
             
-            ViewBag.TroopLevels = Enum.GetValues<TroopLevel>()
-                .Select(level => new { Value = level.ToString(), Text = level.ToString() })
-                .ToList();
+            // Create TroopLevels list explicitly to prevent null reference
+            ViewBag.TroopLevels = new List<object>
+            {
+                new { Value = "Daisy", Text = "Daisy" },
+                new { Value = "Brownie", Text = "Brownie" },
+                new { Value = "Junior", Text = "Junior" },
+                new { Value = "Cadette", Text = "Cadette" },
+                new { Value = "Senior", Text = "Senior" },
+                new { Value = "Ambassador", Text = "Ambassador" }
+            };
 
             return View(members);
         }

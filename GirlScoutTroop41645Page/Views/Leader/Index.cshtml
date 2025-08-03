@@ -4,7 +4,17 @@
     ViewData["Title"] = "Leader Dashboard";
     var memberRoles = ViewBag.MemberRoles as Dictionary<string, IList<string>>;
     var availableRoles = ViewBag.AvailableRoles as SelectList;
-    var troopLevels = ViewBag.TroopLevels as List<dynamic>;
+    var troopLevels = ViewBag.TroopLevels as List<dynamic> ?? new List<dynamic>();
+    // Create TroopLevels list explicitly to prevent null reference
+    ViewBag.TroopLevels = new List<object>
+{
+    new { Value = "Daisy", Text = "Daisy" },
+    new { Value = "Brownie", Text = "Brownie" },
+    new { Value = "Junior", Text = "Junior" },
+    new { Value = "Cadette", Text = "Cadette" },
+    new { Value = "Senior", Text = "Senior" },
+    new { Value = "Ambassador", Text = "Ambassador" }
+};
 }
 
 <div class="container">
