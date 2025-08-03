@@ -10,5 +10,5 @@ public class Scout
     public string? LastName { get; set; }
     public DateTime DateOfBirth { get; set; }
     public string? Level { get; set; }
-    public List<Member> Members { get; set; } = [];
+    public List<Member> Members { get; set; } = new List<Member>();
 }

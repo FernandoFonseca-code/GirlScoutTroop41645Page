@@ -13,9 +13,5 @@ public class Member : IdentityUser
     public string? ZipCode { get; set; }
     public DateTime? DateOfBirth { get; set; }
     public List<Scout> Scouts { get; set; } = [];
-    
-    /// <summary>
-    /// Comma-separated list of troop levels for TroopSectionLeader role (e.g., "Daisy,Brownie")
-    /// </summary>
     public string? TroopLevelSubcategories { get; set; }
 }

@@ -64,7 +64,7 @@
         <div class="card-footer">
             <div class="btn-group">
                 <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-                @if (User.IsInRole("Admin") || User.Identity.Name == Model.UserName)
+                @if (User.IsInRole("TroopLeader, TroopSectionLeader") || User.Identity.Name == Model.UserName)
                 {
                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
                     <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
