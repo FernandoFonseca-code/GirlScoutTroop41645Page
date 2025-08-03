@@ -2,11 +2,25 @@
 
 namespace GirlScoutTroop41645Page.Models;
 
-public class IdentityHelper
+public static class IdentityHelper
 {
+    // Role constants (these should remain without spaces for database storage)
     public const string TroopLeader = "TroopLeader";
     public const string TroopSectionLeader = "TroopSectionLeader";
     public const string Parent = "Parent";
+    
+    // Display names for roles
+    public static readonly Dictionary<string, string> RoleDisplayNames = new()
+    {
+        { TroopLeader, "Troop Leader" },
+        { TroopSectionLeader, "Troop Section Leader" },
+        { Parent, "Parent" }
+    };
+    
+    public static string GetRoleDisplayName(string role)
+    {
+        return RoleDisplayNames.ContainsKey(role) ? RoleDisplayNames[role] : role;
+    }
 
     public static async Task CreateRoles(IServiceProvider provider, params string[] roles)
     {

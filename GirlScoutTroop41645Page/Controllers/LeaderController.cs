@@ -36,9 +36,9 @@ namespace GirlScoutTroop41645Page.Controllers
             ViewBag.MemberRoles = memberRoles;
             ViewBag.AvailableRoles = new SelectList(new[]
             {
-                new { Value = IdentityHelper.TroopLeader, Text = "Troop Leader" },
-                new { Value = IdentityHelper.TroopSectionLeader, Text = "Troop Section Leader" },
-                new { Value = IdentityHelper.Parent, Text = "Parent" }
+                new { Value = IdentityHelper.TroopLeader, Text = IdentityHelper.GetRoleDisplayName(IdentityHelper.TroopLeader) },
+                new { Value = IdentityHelper.TroopSectionLeader, Text = IdentityHelper.GetRoleDisplayName(IdentityHelper.TroopSectionLeader) },
+                new { Value = IdentityHelper.Parent, Text = IdentityHelper.GetRoleDisplayName(IdentityHelper.Parent) }
             }, "Value", "Text");
             
             // Create TroopLevels list explicitly to prevent null reference
@@ -83,14 +83,16 @@ namespace GirlScoutTroop41645Page.Controllers
             // Check if user already has this role
             if (await _userManager.IsInRoleAsync(member, role))
             {
-                TempData["Warning"] = $"Member {member.FirstName} {member.LastName} already has the {role} role.";
+                var roleDisplayName = IdentityHelper.GetRoleDisplayName(role);
+                TempData["Warning"] = $"Member {member.FirstName} {member.LastName} already has the {roleDisplayName} role.";
                 return RedirectToAction(nameof(Index));
             }
 
             var result = await _userManager.AddToRoleAsync(member, role);
             if (result.Succeeded)
             {
-                TempData["Success"] = $"Successfully assigned {role} role to {member.FirstName} {member.LastName}.";
+                var roleDisplayName = IdentityHelper.GetRoleDisplayName(role);
+                TempData["Success"] = $"Successfully assigned {roleDisplayName} role to {member.FirstName} {member.LastName}.";
             }
             else
             {
@@ -122,7 +124,7 @@ namespace GirlScoutTroop41645Page.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             if (member.Id == currentUser?.Id && role == IdentityHelper.TroopLeader)
             {
-                TempData["Error"] = "You cannot remove the TroopLeader role from yourself.";
+                TempData["Error"] = "You cannot remove the Troop Leader role from yourself.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -136,7 +138,8 @@ namespace GirlScoutTroop41645Page.Controllers
                     await _userManager.UpdateAsync(member);
                 }
                 
-                TempData["Success"] = $"Successfully removed {role} role from {member.FirstName} {member.LastName}.";
+                var roleDisplayName = IdentityHelper.GetRoleDisplayName(role);
+                TempData["Success"] = $"Successfully removed {roleDisplayName} role from {member.FirstName} {member.LastName}.";
             }
             else
             {
@@ -167,7 +170,7 @@ namespace GirlScoutTroop41645Page.Controllers
             // Check if member has TroopSectionLeader role
             if (!await _userManager.IsInRoleAsync(member, IdentityHelper.TroopSectionLeader))
             {
-                TempData["Error"] = "Member must have TroopSectionLeader role to assign subcategories.";
+                TempData["Error"] = "Member must have Troop Section Leader role to assign subcategories.";
                 return RedirectToAction(nameof(Index));
             }
 
