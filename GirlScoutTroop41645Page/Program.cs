@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Newtonsoft.Json.Linq;
 using Microsoft.Azure.SignalR;
 
-
 var builder = WebApplication.CreateBuilder(args);
 var secrets = builder.Configuration.GetSection("GoogleCalendar").Get<Dictionary<string, string>>();
 
@@ -32,27 +31,22 @@ builder.Services.AddAuthentication(o =>
     // Once a user is authenticated, the OAuth2 token info is stored in cookies.
     o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-
-        .AddCookie()
-        .AddGoogleOpenIdConnect(options =>
-        {
-            options.ClientId = secrets["ClientId"];
-            options.ClientSecret = secrets["ClientSecret"];
-            options.CallbackPath = "/signin-google";
-        });
+.AddCookie()
+.AddGoogleOpenIdConnect(options =>
+{
+    options.ClientId = secrets["ClientId"];
+    options.ClientSecret = secrets["ClientSecret"];
+    options.CallbackPath = "/signin-google";
+});
 
 // Adds Google Calendar services
 builder.Services.AddSingleton<GoogleCalendarService>();
 // Adds email sender service
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 // Adds Identity services
-builder.Services.AddDefaultIdentity<Member>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = true;
-    options.SignIn.RequireConfirmedEmail = true;
-})
-.AddRoles<IdentityRole>() // This line adds role management support
-.AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<Member>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>() // Make sure this line is present
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
 
@@ -99,11 +93,19 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-var serviceProvider = app.Services.GetRequiredService<IServiceProvider>().CreateScope();
-await Task.Run(async () =>
+// Seed roles and create default user using your existing IdentityHelper
+using (var scope = app.Services.CreateScope())
 {
-    await IdentityHelper.CreateRoles(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader, IdentityHelper.TroopSectionLeader, IdentityHelper.Parent);
-    await IdentityHelper.CreateDefaultUser(serviceProvider.ServiceProvider, IdentityHelper.TroopLeader);
-});
+    var serviceProvider = scope.ServiceProvider;
+    
+    // Create roles
+    await IdentityHelper.CreateRoles(serviceProvider, 
+        IdentityHelper.TroopLeader, 
+        IdentityHelper.TroopSectionLeader, 
+        IdentityHelper.Parent);
+    
+    // Create default TroopLeader user if none exists
+    await IdentityHelper.CreateDefaultUser(serviceProvider, IdentityHelper.TroopLeader);
+}
 
 app.Run();

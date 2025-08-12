@@ -1,5 +1,5 @@
 using GirlScoutTroop41645Page.Data;
-using GirlScoutTroop41645Page.Models;
+using GirlScoutTroop41645Page.Models; // This will include IdentityHelper
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -211,6 +211,31 @@ namespace GirlScoutTroop41645Page.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // Add this method to your LeaderController for debugging
+        [HttpGet]
+        public async Task<IActionResult> DebugUserRoles()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Json(new { Error = "User not found" });
+            }
+
+            var roles = await _userManager.GetRolesAsync(currentUser);
+            var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            
+            return Json(new 
+            { 
+                UserId = currentUser.Id,
+                UserName = currentUser.UserName,
+                Email = currentUser.Email,
+                Roles = roles,
+                Claims = claims,
+                IsInTroopLeaderRole = await _userManager.IsInRoleAsync(currentUser, "TroopLeader"),
+                IsAuthenticated = User.Identity?.IsAuthenticated ?? false
+            });
         }
     }
 }
