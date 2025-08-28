@@ -193,6 +193,10 @@ namespace GirlScoutTroop41645Page.Areas.Identity.Pages.Account
             try
             {
                 var user = Activator.CreateInstance<Member>();
+                
+                // Assign the FirstName and LastName from the Input model
+                user.FirstName = Input.FirstName;
+                user.LastName = Input.LastName;
 
                 // Add null handling for DateOfBirth
                 if (user.DateOfBirth.HasValue)
