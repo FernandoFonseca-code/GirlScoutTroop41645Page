@@ -37,6 +37,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Scouts" asp-action="Index">Scouts</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Forms" asp-action="Available">Forms</a>
+                            </li>
                         }
 
                         @if (User.IsInRole("TroopLeader") || User.IsInRole("TroopSectionLeader"))
@@ -47,6 +50,9 @@
                             <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Email" asp-action="Send">Email</a>
                         </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Forms" asp-action="Index">Manage Forms</a>
+                            </li>
                         }
 
                         @if (User.IsInRole("TroopLeader"))

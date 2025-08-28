@@ -1,0 +1,183 @@
+@model GirlScoutTroop41645Page.Models.Form
+
+@{
+    ViewData["Title"] = "Form Submissions";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Submissions for: @Model.Title</h3>
+                    <p class="mb-0">
+                        <strong>Total Submissions:</strong> @Model.FormSubmissions.Count
+                        @if (Model.DueDate.HasValue)
+                        {
+                            <span class="ms-3"><strong>Due Date:</strong> @Model.DueDate.Value.ToString("MMM dd, yyyy")</span>
+                        }
+                    </p>
+                </div>
+                <div class="card-body">
+                    @if (!Model.FormSubmissions.Any())
+                    {
+                        <div class="alert alert-info">
+                            <h5>No Submissions Yet</h5>
+                            <p class="mb-0">No one has submitted this form yet.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Submitter</th>
+                                        <th>Submitted</th>
+                                        @foreach (var field in Model.FormFields.OrderBy(f => f.DisplayOrder))
+                                        {
+                                            <th>@field.Label</th>
+                                        }
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var submission in Model.FormSubmissions.OrderByDescending(s => s.SubmittedDate))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@submission.SubmittedByMember.FirstName @submission.SubmittedByMember.LastName</strong>
+                                                <br />
+                                                <small class="text-muted">@submission.SubmittedByMember.Email</small>
+                                            </td>
+                                            <td>
+                                                @submission.SubmittedDate.ToString("MMM dd, yyyy")
+                                                <br />
+                                                <small class="text-muted">@submission.SubmittedDate.ToString("h:mm tt")</small>
+                                            </td>
+                                            @foreach (var field in Model.FormFields.OrderBy(f => f.DisplayOrder))
+                                            {
+                                                <td>
+                                                    @{
+                                                        var response = submission.FormFieldResponses.FirstOrDefault(r => r.FormFieldId == field.FormFieldId);
+                                                        var responseText = response?.Response ?? "-";
+                                                        
+                                                        // Truncate long responses for table display
+                                                        if (responseText.Length > 50)
+                                                        {
+                                                            responseText = responseText.Substring(0, 47) + "...";
+                                                        }
+                                                    }
+                                                    
+                                                    @if (field.FieldType == GirlScoutTroop41645Page.Models.FormFieldType.Checkbox)
+                                                    {
+                                                        @if (response?.Response == "Yes")
+                                                        {
+                                                            <i class="fas fa-check text-success"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="fas fa-times text-muted"></i>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span title="@(response?.Response ?? "No response")">@responseText</span>
+                                                    }
+                                                </td>
+                                            }
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#submissionModal_@submission.FormSubmissionId">
+                                                    View Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Modals for detailed view -->
+                        @foreach (var submission in Model.FormSubmissions)
+                        {
+                            <div class="modal fade" id="submissionModal_@submission.FormSubmissionId" tabindex="-1">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">
+                                                Submission by @submission.SubmittedByMember.FirstName @submission.SubmittedByMember.LastName
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <strong>Submitted:</strong> @submission.SubmittedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
+                                                <br />
+                                                <strong>Email:</strong> @submission.SubmittedByMember.Email
+                                            </div>
+                                            <hr />
+                                            @foreach (var field in Model.FormFields.OrderBy(f => f.DisplayOrder))
+                                            {
+                                                var response = submission.FormFieldResponses.FirstOrDefault(r => r.FormFieldId == field.FormFieldId);
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">
+                                                        @field.Label
+                                                        @if (field.IsRequired)
+                                                        {
+                                                            <span class="text-danger">*</span>
+                                                        }
+                                                    </label>
+                                                    <div class="border p-2 bg-light rounded">
+                                                        @if (response != null && !string.IsNullOrEmpty(response.Response))
+                                                        {
+                                                            @if (field.FieldType == GirlScoutTroop41645Page.Models.FormFieldType.TextArea)
+                                                            {
+                                                                <pre class="mb-0">@response.Response</pre>
+                                                            }
+                                                            else if (field.FieldType == GirlScoutTroop41645Page.Models.FormFieldType.Checkbox)
+                                                            {
+                                                                @if (response.Response == "Yes")
+                                                                {
+                                                                    <i class="fas fa-check text-success"></i> <span>Yes</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <i class="fas fa-times text-muted"></i> <span>No</span>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                @response.Response
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <em class="text-muted">No response provided</em>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">Back to Forms</a>
+                        <div>
+                            <a asp-action="Details" asp-route-id="@Model.FormId" class="btn btn-info">View Form</a>
+                            <a asp-action="Edit" asp-route-id="@Model.FormId" class="btn btn-primary">Edit Form</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
