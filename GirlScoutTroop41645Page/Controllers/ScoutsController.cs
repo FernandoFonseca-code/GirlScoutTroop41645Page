@@ -143,7 +143,7 @@ namespace GirlScoutTroop41645Page.Controllers
                 return NotFound();
             }
 
-            var scout = await _context.Scouts.FindAsync(id);
+            var scout = await _context.Scouts.AsNoTracking().FirstOrDefaultAsync(s => s.ScoutId == id);
             if (scout == null)
             {
                 return NotFound();
@@ -178,6 +178,13 @@ namespace GirlScoutTroop41645Page.Controllers
             {
                 try
                 {
+                    // Detach any existing tracked entity with the same key
+                    var existingEntity = _context.Entry(_context.Scouts.Local.FirstOrDefault(s => s.ScoutId == id));
+                    if (existingEntity != null)
+                    {
+                        existingEntity.State = EntityState.Detached;
+                    }
+
                     _context.Update(scout);
                     await _context.SaveChangesAsync();
                 }
