@@ -1,0 +1,100 @@
+@model IEnumerable<GirlScoutTroop41645Page.Models.Form>
+
+@{
+    ViewData["Title"] = "Available Forms";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2>@ViewData["Title"]</h2>
+            
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Message"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">
+                    <h4>No forms available</h4>
+                    <p>There are currently no active forms to fill out.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    @foreach (var form in Model)
+                    {
+                        var isSubmitted = ViewBag.SubmittedFormIds != null && ((List<int>)ViewBag.SubmittedFormIds).Contains(form.FormId);
+                        var isExpired = form.DueDate.HasValue && form.DueDate < DateTime.UtcNow;
+                        
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 @(isSubmitted ? "border-success" : "") @(isExpired ? "border-warning" : "")">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">@form.Title</h5>
+                                    @if (isSubmitted)
+                                    {
+                                        <span class="badge bg-success">Completed</span>
+                                    }
+                                    else if (isExpired)
+                                    {
+                                        <span class="badge bg-warning">Expired</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary">Available</span>
+                                    }
+                                </div>
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(form.Description))
+                                    {
+                                        <p class="card-text">@form.Description</p>
+                                    }
+                                    
+                                    @if (form.DueDate.HasValue)
+                                    {
+                                        <div class="mb-2">
+                                            <small class="text-muted">
+                                                <strong>Due:</strong> @form.DueDate.Value.ToString("MMM dd, yyyy")
+                                            </small>
+                                        </div>
+                                    }
+                                    
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <strong>Total Submissions:</strong> @form.FormSubmissions.Count
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    @if (isSubmitted)
+                                    {
+                                        <button class="btn btn-success w-100" disabled>
+                                            <i class="fas fa-check"></i> Already Submitted
+                                        </button>
+                                    }
+                                    else if (isExpired)
+                                    {
+                                        <button class="btn btn-warning w-100" disabled>
+                                            <i class="fas fa-clock"></i> Expired
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Fill" asp-route-id="@form.FormId" class="btn btn-primary w-100">
+                                            <i class="fas fa-edit"></i> Fill Out Form
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

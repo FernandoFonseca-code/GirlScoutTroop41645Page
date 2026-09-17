@@ -1,0 +1,178 @@
+@model GirlScoutTroop41645Page.Models.Form
+
+@{
+    ViewData["Title"] = "Fill Out Form";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>@Model.Title</h3>
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <p class="card-text">@Model.Description</p>
+                    }
+                    @if (Model.DueDate.HasValue)
+                    {
+                        <small class="text-muted">Due: @Model.DueDate.Value.ToString("MMM dd, yyyy")</small>
+                    }
+                </div>
+                <div class="card-body">
+                    <form asp-action="Submit" asp-route-id="@Model.FormId" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger">
+                                <h6>Please correct the following errors:</h6>
+                                <ul class="mb-0">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        @foreach (var field in Model.FormFields.OrderBy(f => f.DisplayOrder))
+                        {
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    @field.Label
+                                    @if (field.IsRequired)
+                                    {
+                                        <span class="text-danger">*</span>
+                                    }
+                                </label>
+                                
+                                @if (!string.IsNullOrEmpty(field.HelpText))
+                                {
+                                    <div class="form-text mb-2">@field.HelpText</div>
+                                }
+
+                                @switch (field.FieldType)
+                                {
+                                    case GirlScoutTroop41645Page.Models.FormFieldType.Text:
+                                        <input type="text" 
+                                               name="responses[@field.FormFieldId]" 
+                                               class="form-control" 
+                                               @(field.IsRequired ? "required" : "") />
+                                        break;
+                                        
+                                    case GirlScoutTroop41645Page.Models.FormFieldType.TextArea:
+                                        <textarea name="responses[@field.FormFieldId]" 
+                                                  class="form-control" 
+                                                  rows="4"
+                                                  @(field.IsRequired ? "required" : "")></textarea>
+                                        break;
+                                        
+                                    case GirlScoutTroop41645Page.Models.FormFieldType.Number:
+                                        <input type="number" 
+                                               name="responses[@field.FormFieldId]" 
+                                               class="form-control"
+                                               @(field.IsRequired ? "required" : "") />
+                                        break;
+                                        
+                                    case GirlScoutTroop41645Page.Models.FormFieldType.Email:
+                                        <input type="email" 
+                                               name="responses[@field.FormFieldId]" 
+                                               class="form-control"
+                                               @(field.IsRequired ? "required" : "") />
+                                        break;
+                                        
+                                    case GirlScoutTroop41645Page.Models.FormFieldType.Date:
+                                        <input type="date" 
+                                               name="responses[@field.FormFieldId]" 
+                                               class="form-control"
+                                               @(field.IsRequired ? "required" : "") />
+                                        break;
+                                        
+                                    case GirlScoutTroop41645Page.Models.FormFieldType.Checkbox:
+                                        <div class="form-check">
+                                            <input type="checkbox" 
+                                                   name="responses[@field.FormFieldId]" 
+                                                   value="Yes"
+                                                   class="form-check-input" 
+                                                   id="field_@field.FormFieldId" />
+                                            <label class="form-check-label" for="field_@field.FormFieldId">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        break;
+                                        
+                                    case GirlScoutTroop41645Page.Models.FormFieldType.Radio:
+                                        @if (!string.IsNullOrEmpty(field.Options))
+                                        {
+                                            @foreach (var option in field.Options.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                                            {
+                                                var optionValue = option.Trim();
+                                                var optionId = $"field_{field.FormFieldId}_{optionValue.Replace(" ", "_")}";
+                                                <div class="form-check">
+                                                    <input type="radio" 
+                                                           name="responses[@field.FormFieldId]" 
+                                                           value="@optionValue"
+                                                           class="form-check-input" 
+                                                           id="@optionId"
+                                                           @(field.IsRequired ? "required" : "") />
+                                                    <label class="form-check-label" for="@optionId">
+                                                        @optionValue
+                                                    </label>
+                                                </div>
+                                            }
+                                        }
+                                        break;
+                                        
+                                    case GirlScoutTroop41645Page.Models.FormFieldType.Dropdown:
+                                        <select name="responses[@field.FormFieldId]" 
+                                                class="form-select"
+                                                @(field.IsRequired ? "required" : "")>
+                                            <option value="">Select an option...</option>
+                                            @if (!string.IsNullOrEmpty(field.Options))
+                                            {
+                                                @foreach (var option in field.Options.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                                                {
+                                                    var optionValue = option.Trim();
+                                                    <option value="@optionValue">@optionValue</option>
+                                                }
+                                            }
+                                        </select>
+                                        break;
+                                }
+                                
+                                @if (ViewData.ModelState.ContainsKey($"responses[{field.FormFieldId}]"))
+                                {
+                                    <div class="text-danger">
+                                        @foreach (var error in ViewData.ModelState[$"responses[{field.FormFieldId}]"].Errors)
+                                        {
+                                            <small>@error.ErrorMessage</small>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @if (!Model.FormFields.Any())
+                        {
+                            <div class="alert alert-warning">
+                                This form has no fields yet. Please contact the form administrator.
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex justify-content-between mt-4">
+                                <a asp-action="Available" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Submit Form</button>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
