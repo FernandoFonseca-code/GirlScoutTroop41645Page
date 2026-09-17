@@ -41,7 +41,11 @@ public static class IdentityHelper
         var UserManager = provider.GetRequiredService<UserManager<Member>>();
         var configuration = provider.GetRequiredService<IConfiguration>();
 
-        string password = configuration["GoogleCalendar:TroopLeaderPassword"];
+        string? password = configuration["SeedData:TroopLeaderPassword"] ?? configuration["GoogleCalendar:TroopLeaderPassword"];
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            throw new InvalidOperationException("Default Troop Leader seeding is enabled, but no password is configured in 'SeedData:TroopLeaderPassword'.");
+        }
         // checks to see how many users are in the specified role
         int numUsers = (await UserManager.GetUsersInRoleAsync(role)).Count();
         if (numUsers == 0)

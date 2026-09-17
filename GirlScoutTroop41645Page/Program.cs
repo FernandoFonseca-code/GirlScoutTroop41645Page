@@ -10,10 +10,20 @@ using Newtonsoft.Json.Linq;
 using Microsoft.Azure.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
-var secrets = builder.Configuration.GetSection("GoogleCalendar").Get<Dictionary<string, string>>();
+string? connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'DatabaseConnection' is not configured.");
+}
+
+string? googleClientId = builder.Configuration["GoogleCalendar:ClientId"];
+string? googleClientSecret = builder.Configuration["GoogleCalendar:ClientSecret"];
+if (string.IsNullOrWhiteSpace(googleClientId) || string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    throw new InvalidOperationException("Google OAuth settings are missing. Configure 'GoogleCalendar:ClientId' and 'GoogleCalendar:ClientSecret'.");
+}
 
 // Add services to the container.
-string connectionString = builder.Configuration.GetConnectionString("DatabaseConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -34,8 +44,8 @@ builder.Services.AddAuthentication(o =>
 .AddCookie()
 .AddGoogleOpenIdConnect(options =>
 {
-    options.ClientId = secrets["ClientId"];
-    options.ClientSecret = secrets["ClientSecret"];
+    options.ClientId = googleClientId;
+    options.ClientSecret = googleClientSecret;
     options.CallbackPath = "/signin-google";
 });
 
@@ -65,7 +75,21 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._!@+";
     options.User.RequireUniqueEmail = false;
 });
-builder.Services.AddSignalR().AddAzureSignalR(builder.Configuration["Azure:SignalR:ConnectionString"]!);
+bool useAzureSignalR = builder.Configuration.GetValue<bool>("Azure:SignalR:Enabled");
+string? azureSignalRConnectionString = builder.Configuration["Azure:SignalR:ConnectionString"];
+if (useAzureSignalR)
+{
+    if (string.IsNullOrWhiteSpace(azureSignalRConnectionString))
+    {
+        throw new InvalidOperationException("Azure SignalR is enabled but 'Azure:SignalR:ConnectionString' is not configured.");
+    }
+
+    builder.Services.AddSignalR().AddAzureSignalR(azureSignalRConnectionString);
+}
+else
+{
+    builder.Services.AddSignalR();
+}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -104,8 +128,12 @@ using (var scope = app.Services.CreateScope())
         IdentityHelper.TroopSectionLeader, 
         IdentityHelper.Parent);
     
-    // Create default TroopLeader user if none exists
-    await IdentityHelper.CreateDefaultUser(serviceProvider, IdentityHelper.TroopLeader);
+    bool createDefaultTroopLeader = builder.Configuration.GetValue<bool>("SeedData:CreateDefaultTroopLeader");
+    if (createDefaultTroopLeader)
+    {
+        // Create default TroopLeader user if none exists
+        await IdentityHelper.CreateDefaultUser(serviceProvider, IdentityHelper.TroopLeader);
+    }
 }
 
 app.Run();

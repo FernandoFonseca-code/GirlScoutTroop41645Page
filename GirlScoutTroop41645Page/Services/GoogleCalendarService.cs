@@ -9,7 +9,7 @@ using Google.Apis.Util.Store;
 public class GoogleCalendarService
 {
     private readonly IConfiguration _configuration;
-    private readonly string _tokenPath = "D:\\Fernando Fonseca\\GirlScoutTroop41645Page\\GirlScoutTroop41645Page\\AppData\\Token.json";
+    private readonly string _tokenPath;
     private readonly string[] _scopes = { CalendarService.Scope.Calendar };
     private readonly string _clientId;
     private readonly string _clientSecret;
@@ -31,12 +31,22 @@ public class GoogleCalendarService
         _clientSecret = _configuration["GoogleCalendar:ClientSecret"];
         _applicationName = _configuration["GoogleCalendar:ApplicationName"];
         _calendarId = _configuration["GoogleCalendar:CalendarId"];
+        _redirectUri = _configuration["GoogleCalendar:RedirectUri"];
+
+        _tokenPath = _configuration["GoogleCalendar:TokenPath"]
+            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GirlScoutTroop41645Page", "GoogleCalendarTokens");
+        Directory.CreateDirectory(_tokenPath);
     }
 
     // Then modify GetAuthorizationUrl() and GetCalendarServiceAsync() to use
     // ClientSecrets directly instead of loading from a file
     public string GetAuthorizationUrl()
     {
+        if (string.IsNullOrWhiteSpace(_redirectUri))
+        {
+            throw new Exception("Google Calendar redirect URI is not configured.");
+        }
+
         var clientSecrets = new ClientSecrets
         {
             ClientId = _clientId,
